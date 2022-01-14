@@ -15,6 +15,7 @@
 from pathlib import Path
 
 from pyspark.sql import Row, SparkSession
+import torch
 
 from rikai.types import Image
 
@@ -25,18 +26,20 @@ def test_torchhub(spark: SparkSession):
     spark.createDataFrame(
         [Row(image=Image(image_path))]
     ).createOrReplaceTempView("images")
-    spark.sql(
-        f"""
-CREATE MODEL yolov5
-FLAVOR yolov5
-OPTIONS (device="cpu", batch_size=32)
-USING "torchhub:///ultralytics/yolov5:v6.0/yolov5s";
-    """
-    )
-    result = spark.sql(
-        f"""
-    select ML_PREDICT(yolov5, image) as pred FROM images
-    """
-    )
-
-    assert len(result.first().pred.boxes) > 0
+    for name in torch.hub.list("ultralytics/yolov5:v6.0"):
+        if name.startswith("yolo"):
+            spark.sql(
+                f"""
+                CREATE MODEL {name}
+                FLAVOR yolov5 
+                OPTIONS (device="cpu", batch_size=32)
+                USING "torchhub:///ultralytics/yolov5:v6.0/{name}";
+                """
+            )
+            result = spark.sql(
+                f"""
+            select ML_PREDICT({name}, image) as pred FROM images
+            """
+            )
+        
+            assert len(result.first().pred.boxes) > 0
