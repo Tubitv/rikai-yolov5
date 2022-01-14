@@ -42,4 +42,4 @@ def test_torchhub(spark: SparkSession):
             """
             )
         
-            assert len(result.first().pred.boxes) > 0
+            assert len(result.first().pred) > 0

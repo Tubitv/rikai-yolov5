@@ -116,5 +116,5 @@ def test_yolov5(tmp_path: Path, spark: SparkSession):
         """
         )
 
-        assert len(result1.first().pred.boxes) > 0
-        assert len(result2.first().pred.boxes) > 0
+        assert len(result1.first().pred) > 0
+        assert len(result2.first().pred) > 0
