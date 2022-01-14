@@ -39,7 +39,7 @@ from yolov5.utils.general import (
 )
 from yolov5.utils.torch_utils import time_sync
 
-from rikai.types import Image
+from rikai.types import Image, Box2d
 
 __all__ = ["pre_processing", "post_processing", "OUTPUT_SCHEMA"]
 
@@ -118,22 +118,17 @@ def post_processing(options: Dict[str, Any]) -> Callable:
 
             results = []
             for predicts in detections.pred:
-                predict_result = {
-                    "boxes": [],
-                    "label_ids": [],
-                    "scores": [],
-                }
+                preds = []
                 for *box, conf, cls in predicts.tolist():
-                    predict_result["boxes"].append(box)
-                    predict_result["label_ids"].append(cls)
-                    predict_result["scores"].append(conf)
-                results.append(predict_result)
+                    preds.append({
+                        "box": Box2d(*box),
+                        "label_id": cls,
+                        "score": conf,
+                    })
+                results.append(preds)
             return results
 
     return post_process_func
 
 
-OUTPUT_SCHEMA = (
-    "struct<boxes:array<array<float>>, scores:array<float>, "
-    "label_ids:array<int>>"
-)
+OUTPUT_SCHEMA = "array<struct<box:box2d, score:float, label_id:int>>"
