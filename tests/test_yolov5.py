@@ -22,7 +22,7 @@ import yolov5
 from pyspark.sql import Row, SparkSession
 
 import rikai
-from rikai.contrib.yolov5.transforms import OUTPUT_SCHEMA
+from rikai.contrib.torchhub.ultralytics.yolov5.yolov5 import OUTPUT_SCHEMA
 from rikai.types import Image
 
 
@@ -45,8 +45,8 @@ def test_yolov5(tmp_path: Path, spark: SparkSession):
         if os.path.exists(pretrained):
             urllib.request.urlretrieve(url, pretrained)
         model = yolov5.load(pretrained)
-        pre = "rikai.contrib.yolov5.transforms.pre_processing"
-        post = "rikai.contrib.yolov5.transforms.post_processing"
+        pre = "rikai.contrib.torchhub.ultralytics.yolov5.yolov5.pre_processing"
+        post = "rikai.contrib.torchhub.ultralytics.yolov5.yolov5.post_processing"
         if torch.cuda.is_available():
             print("Using GPU\n")
             device = "gpu"
@@ -55,10 +55,10 @@ def test_yolov5(tmp_path: Path, spark: SparkSession):
             device = "cpu"
 
         spark.conf.set(
-            "rikai.sql.ml.registry.mlflow.tracking_uri", tracking_uri
+            "spark.rikai.sql.ml.registry.mlflow.tracking_uri", tracking_uri
         )
-        work_dir = Path().absolute().parent.parent
-        image_path = f"{work_dir}/python/tests/assets/test_image.jpg"
+        work_dir = Path().absolute()
+        image_path = f"{work_dir}/tests/assets/test_image.jpg"
 
         # Use case 1: log model with customized flavor
         rikai.mlflow.pytorch.log_model(
