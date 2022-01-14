@@ -16,6 +16,7 @@ setup(
             # for testing
             "pytest",
             "mlflow",
+            "rikai-torchhub"
         ]
     },
     packages=find_namespace_packages(include=["rikai.*"]),
