@@ -16,13 +16,12 @@ from pathlib import Path
 
 from pyspark.sql import Row, SparkSession
 
-from rikai.contrib.yolov5.transforms import OUTPUT_SCHEMA
 from rikai.types import Image
 
 
-def test_yolov5(spark: SparkSession):
-    work_dir = Path().absolute().parent.parent
-    image_path = f"{work_dir}/python/tests/assets/test_image.jpg"
+def test_torchhub(spark: SparkSession):
+    work_dir = Path().absolute()
+    image_path = f"{work_dir}/tests/assets/test_image.jpg"
     spark.createDataFrame(
         [Row(image=Image(image_path))]
     ).createOrReplaceTempView("images")
@@ -30,10 +29,7 @@ def test_yolov5(spark: SparkSession):
         f"""
 CREATE MODEL yolov5
 FLAVOR yolov5
-PREPROCESSOR 'rikai.contrib.yolov5.transforms.pre_processing'
-POSTPROCESSOR 'rikai.contrib.yolov5.transforms.post_processing'
 OPTIONS (device="cpu", batch_size=32)
-RETURNS {OUTPUT_SCHEMA}
 USING "torchhub:///ultralytics/yolov5:v6.0/yolov5s";
     """
     )
