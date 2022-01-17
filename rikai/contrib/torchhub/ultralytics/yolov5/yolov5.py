@@ -122,7 +122,7 @@ def post_processing(options: Dict[str, Any]) -> Callable:
                 for *box, conf, cls in predicts.tolist():
                     preds.append({
                         "box": Box2d(*box),
-                        "label": model.names[int(cls)],
+                        "label": None if cls is None else model.names[int(cls)],
                         "score": conf,
                     })
                 results.append(preds)
