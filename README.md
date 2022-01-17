@@ -2,6 +2,9 @@
 `rikai-yolov5` integrates Yolov5 implemented in PyTorch with Rikai. It is based
 on the [packaged ultralytics/yolov5](https://github.com/fcakyon/yolov5-pip).
 
+## Notebooks
++ [Demo 1](https://colab.research.google.com/github/Tubitv/rikai-yolov5/blob/main/notebooks/Mojito.ipynb): Using Rikai to analyze an image from Jay Chou's Mojito.
+
 ## Usage
 There are two ways to use `rikai-yolov5`.
 
