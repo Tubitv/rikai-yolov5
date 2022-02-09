@@ -22,7 +22,7 @@ from pyspark.sql.functions import pandas_udf
 from pyspark.sql.types import BinaryType
 from torch.utils.data import DataLoader
 
-from rikai.torch.pandas import PandasDataset
+from rikai.pytorch.pandas import PandasDataset
 
 DEFAULT_NUM_WORKERS = 8
 DEFAULT_BATCH_SIZE = 4
