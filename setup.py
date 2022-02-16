@@ -8,7 +8,7 @@ with open(
 
 setup(
     name="rikai-yolov5",
-    version="0.0.5",
+    version="0.0.6",
     license="Apache License, Version 2.0",
     author="Rikai authors",
     author_email="rikai-dev@eto.ai",
