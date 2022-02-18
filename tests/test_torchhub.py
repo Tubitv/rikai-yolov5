@@ -31,9 +31,7 @@ def test_torchhub(spark: SparkSession):
             spark.sql(
                 f"""
                 CREATE MODEL {name}
-                MODEL_TYPE rikai.contrib.torchhub.ultralytics.yolov5
                 OPTIONS (device="cpu", batch_size=32)
-                RETURNS array<struct<box:box2d, score:float, label:string>>
                 USING "torchhub:///ultralytics/yolov5:v6.0/{name}";
                 """
             )

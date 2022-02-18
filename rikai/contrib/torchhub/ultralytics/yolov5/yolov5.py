@@ -117,9 +117,6 @@ class Yolov5ModelType(TorchModelType):
         )  # uint8 to fp16/32
         t.append(time_sync())
 
-        print(x.shape)
-        print("==> predict end")
-
         with amp.autocast(enabled=p.device.type != "cpu"):
             pred = self.model(x.to(p.device).type_as(p), augment, profile)
             y = pred[0]
