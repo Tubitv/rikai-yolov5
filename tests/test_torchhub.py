@@ -31,7 +31,6 @@ def test_torchhub(spark: SparkSession):
             spark.sql(
                 f"""
                 CREATE MODEL {name}
-                FLAVOR yolov5 
                 OPTIONS (device="cpu", batch_size=32)
                 USING "torchhub:///ultralytics/yolov5:v6.0/{name}";
                 """

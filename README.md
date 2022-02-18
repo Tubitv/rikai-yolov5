@@ -3,31 +3,25 @@
 on the [packaged ultralytics/yolov5](https://github.com/fcakyon/yolov5-pip).
 
 ## Notebooks
-+ [Demo 1](https://colab.research.google.com/github/Tubitv/rikai-yolov5/blob/main/notebooks/Mojito.ipynb): Using Rikai to analyze an image from Jay Chou's Mojito.
++ <a href="https://colab.research.google.com/github/eto-ai/rikai/blob/main/notebooks/Mojito.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> Using Rikai to analyze an image from Jay Chou's Mojito.
 
 ## Usage
 There are two ways to use `rikai-yolov5`.
-
-Set `customized_flavor` to `yolov5` when logging the model, rikai will use
-`rikai.contrib.yolov5.codegen.generate_udf` instead of
-`rikai.spark.sql.codegen.pytorch.generate_udf`.
 
 ``` python
 rikai.mlflow.pytorch.log_model(
     model,
     "model",
     OUTPUT_SCHEMA,
-    pre_processing=pre,
-    post_processing=post,
     registered_model_name=registered_model_name,
-    customized_flavor="yolov5",
+    model_type="yolov5",
 )
 ```
 
-Another way is setting the flavor in Rikai SQL:
+Another way is setting the model_type in Rikai SQL:
 ```
 CREATE MODEL mlflow_yolov5_m
-FLAVOR yolov5
+MODEL_TYPE yolov5
 OPTIONS (
   device='cpu'
 )

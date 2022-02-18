@@ -26,6 +26,7 @@ might not work.
 """  # noqa E501
 
 from typing import Any, Callable, Dict
+import logging
 
 import numpy as np
 import torch
@@ -39,12 +40,13 @@ from yolov5.utils.general import (
 )
 from yolov5.utils.torch_utils import time_sync
 
-from rikai.types import Image, Box2d
+from rikai.pytorch.models import TorchModelType
+from rikai.types import Box2d
 
-__all__ = ["pre_processing", "post_processing", "OUTPUT_SCHEMA"]
+__all__ = ["MODEL_TYPE"]
 
 
-def pre_process_func(im: Image):
+def pre_process_func(im):
     im = np.asarray(exif_transpose(im))
     if im.shape[0] < 5:  # image in CHW
         im = im.transpose((1, 2, 0))  # reverse dataloader .transpose(2, 0, 1)
@@ -54,28 +56,42 @@ def pre_process_func(im: Image):
     return torch.from_numpy(im)
 
 
-def pre_processing(options: Dict[str, Any]) -> Callable:
-    return pre_process_func
+class Yolov5ModelType(TorchModelType):
+    def __init__(self, name: str):
+        super().__init__()
+        self.name = name
 
+    def __repr__(self):
+        return f"ModelType({self.name})"
 
-def post_processing(options: Dict[str, Any]) -> Callable:
-    augment = bool(options.get("augment", False))
-    profile = bool(options.get("profile", False))
-    # NMS confidence threshold
-    conf_thres = float(options.get("conf_thres", 0.25))
-    # NMS IoU threshold
-    iou_thres = float(options.get("iou_thres", 0.45))
-    # maximum number of detections per image
-    max_det = int(options.get("max_det", 1000))
-    image_size = int(options.get("image_size", 640))
+    def schema(self) -> str:
+        return "array<struct<box:box2d, score:float, label:string>>"
 
-    def post_process_func(model, batch):
+    def transform(self) -> Callable:
+        return pre_process_func
+
+    def predict(self, images, *args, **kwargs) -> Any:
+        assert (
+            self.model is not None
+        ), "model has not been initialized via load_model"
+
+        options = self.spec.options
+        augment = bool(options.get("augment", False))
+        profile = bool(options.get("profile", False))
+        # NMS confidence threshold
+        conf_thres = float(options.get("conf_thres", 0.25))
+        # NMS IoU threshold
+        iou_thres = float(options.get("iou_thres", 0.45))
+        # maximum number of detections per image
+        max_det = int(options.get("max_det", 1000))
+        image_size = int(options.get("image_size", 640))
+
         t = [time_sync()]
 
-        p = next(model.parameters())  # for device and type
-        n = len(batch)
+        p = next(self.model.parameters())  # for device and type
+        n = len(images)
         imgs = []
-        for item in batch:
+        for item in images:
             imgs.append(item.cpu().numpy())
         shape0 = []
         shape1 = []
@@ -88,7 +104,7 @@ def post_processing(options: Dict[str, Any]) -> Callable:
                 im if im.data.contiguous else np.ascontiguousarray(im)
             )  # update
         shape1 = [
-            make_divisible(x, int(model.stride.max()))
+            make_divisible(x, int(self.model.stride.max()))
             for x in np.stack(shape1, 0).max(0)
         ]  # inference shape
         x = [
@@ -102,7 +118,7 @@ def post_processing(options: Dict[str, Any]) -> Callable:
         t.append(time_sync())
 
         with amp.autocast(enabled=p.device.type != "cpu"):
-            pred = model(x.to(p.device).type_as(p), augment, profile)
+            pred = self.model(x.to(p.device).type_as(p), augment, profile)
             y = pred[0]
             t.append(time_sync())
 
@@ -122,13 +138,16 @@ def post_processing(options: Dict[str, Any]) -> Callable:
                 for *box, conf, cls in predicts.tolist():
                     preds.append({
                         "box": Box2d(*box),
-                        "label": None if cls is None else model.names[int(cls)],
+                        "label": None if cls is None else self.model.names[int(cls)],
                         "score": conf,
                     })
                 results.append(preds)
             return results
 
-    return post_process_func
+    def release(self):
+        model = self.model.cpu()
+        del model
+        torch.cuda.empty_cache()
 
 
-OUTPUT_SCHEMA = "array<struct<box:box2d, score:float, label:string>>"
+MODEL_TYPE = Yolov5ModelType("yolov5")
