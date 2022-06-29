@@ -16,7 +16,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Tubitv/rikai-yolov5",
     python_requires=">=3.7",
-    install_requires=["rikai>=0.1.4", "yolov5 >=6.0.0, <7.0.0"],
+    install_requires=["rikai>=0.1.12", "yolov5 >=6.0.0, <7.0.0"],
     extras_require={
         "dev": [
             "black",

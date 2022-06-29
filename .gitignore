@@ -6,3 +6,4 @@ mlruns
 .ipynb_checkpoints/
 dist/
 .vscode/
+notebooks/
