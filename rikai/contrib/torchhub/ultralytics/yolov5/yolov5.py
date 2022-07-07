@@ -40,7 +40,7 @@ from yolov5.utils.general import (
 )
 from yolov5.utils.torch_utils import time_sync
 
-from rikai.pytorch.models import TorchModelType
+from rikai.pytorch.models.torch import TorchModelType
 from rikai.types import Box2d
 
 __all__ = ["MODEL_TYPE"]
@@ -57,10 +57,6 @@ def pre_process_func(im):
 
 
 class Yolov5ModelType(TorchModelType):
-    def __init__(self, name: str):
-        super().__init__()
-        self.name = name
-
     def __repr__(self):
         return f"ModelType({self.name})"
 
