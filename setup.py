@@ -8,7 +8,7 @@ with open(
 
 setup(
     name="rikai-yolov5",
-    version="0.1.1",
+    version="0.1.2",
     license="Apache License, Version 2.0",
     author="Rikai authors",
     author_email="rikai-dev@eto.ai",
@@ -16,7 +16,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Tubitv/rikai-yolov5",
     python_requires=">=3.7",
-    install_requires=["rikai >= 0.1.8, <=0.1.10", "yolov5 >=6.0.0, <6.1.0", "torch<=1.10.2", "torchvision<=0.11.3"],
+    install_requires=["rikai>=0.1.13", "yolov5 >=6.0.0, <6.1.0"],
     extras_require={
         "dev": [
             "black",
