@@ -28,13 +28,13 @@ def test_torchhub(spark: SparkSession):
     ).createOrReplaceTempView("images")
     for name in torch.hub.list("ultralytics/yolov5:v6.0"):
         if name.startswith("yolo"):
-            spark.sql(
-                f"""
+            sql_text = f"""
                 CREATE MODEL {name}
                 OPTIONS (device="cpu", batch_size=32)
                 USING "torchhub:///ultralytics/yolov5:v6.0/{name}";
-                """
-            )
+            """
+            print(sql_text)
+            spark.sql(sql_text)
             result = spark.sql(
                 f"""
             select ML_PREDICT({name}, image) as pred FROM images

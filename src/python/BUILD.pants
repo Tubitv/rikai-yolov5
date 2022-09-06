@@ -1,0 +1,28 @@
+python_requirement(
+    name="deps",
+    requirements=[
+        "torch==1.10.2",
+        "torchvision==0.11.3",
+        "rikai==0.1.13",
+        "rikai-torchhub==0.1.0",
+        "yolov5 >=6.0.0, <6.1.0",
+    ],
+    resolve="yolov5_req",
+)
+
+python_sources(
+    name="rikai_yolov5_sources",
+    sources=["rikai/**/*.py"],
+    resolve="yolov5_req",
+)
+
+python_distribution(
+    name="rikai-yolov5",
+    dependencies=[
+        ":rikai_yolov5_sources",
+    ],
+    provides=python_artifact(
+        name="rikai-yolov5",
+        version="0.2.0",
+    ),
+)
