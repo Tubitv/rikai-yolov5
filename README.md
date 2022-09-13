@@ -1,9 +1,4 @@
 # Yolov5 support for Rikai
-```
-./pants run src/python/yolov5/detect.py -- --source tests/assets/test_image.jpg
-```
-
-# Yolov5 support for Rikai
 `rikai-yolov5` integrates Yolov5 implemented in PyTorch with Rikai. It is based
 on the [packaged ultralytics/yolov5](https://github.com/fcakyon/yolov5-pip).
 
