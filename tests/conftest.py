@@ -14,7 +14,6 @@
 
 import pytest
 from pyspark.sql import SparkSession
-
 from rikai.spark.utils import get_default_jar_version, init_spark_session
 
 

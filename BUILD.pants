@@ -16,6 +16,27 @@ python_sources(
     resolve="yolov5_req",
 )
 
+python_sources(
+    name="sources",
+    sources=["tests/conftest.py"],
+    resolve="yolov5_req",
+)
+
+# python_tests(
+#     name="tests",
+#     sources=["tests/test_*.py"],
+#     dependencies=[
+#         ":rikai_yolov5_sources",
+#         ":sources", ":assets"
+#     ],
+#     resolve="yolov5_req",
+# )
+
+resources(
+    name="assets",
+    sources=["tests/assets/*jpg"],
+)
+
 python_distribution(
     name="rikai-yolov5",
     dependencies=[

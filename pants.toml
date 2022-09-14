@@ -19,6 +19,7 @@ shell = "ipython"
 
 [pytest]
 version = "pytest==6.1.2"
+lockfile = "3rdparty/pytest.lock"
 
 [isort]
 args = ["--profile black", "--order-by-type"]
