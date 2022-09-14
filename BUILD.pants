@@ -7,7 +7,7 @@ python_requirement(
         "rikai-torchhub==0.1.0",
         "yolov5 >=6.0.0, <6.1.0",
     ],
-    resolve="yolov5_req",
+    resolve="yolov5_req"
 )
 
 python_sources(
@@ -15,22 +15,6 @@ python_sources(
     sources=["rikai/**/*.py"],
     resolve="yolov5_req",
 )
-
-python_sources(
-    name="sources",
-    sources=["tests/conftest.py"],
-    resolve="yolov5_req",
-)
-
-# python_tests(
-#     name="tests",
-#     sources=["tests/test_*.py"],
-#     dependencies=[
-#         ":rikai_yolov5_sources",
-#         ":sources", ":assets"
-#     ],
-#     resolve="yolov5_req",
-# )
 
 resources(
     name="assets",
@@ -46,4 +30,21 @@ python_distribution(
         name="rikai-yolov5",
         version="0.2.0",
     ),
+)
+
+python_sources(
+    name="sources",
+    sources=["tests/conftest.py"],
+    resolve="yolov5_req",
+)
+
+python_tests(
+    name="tests",
+    sources=["tests/test_*.py"],
+    dependencies=[
+        ":sources",
+        ":assets",
+        ":rikai-yolov5"
+    ],
+    resolve="yolov5_req",
 )
