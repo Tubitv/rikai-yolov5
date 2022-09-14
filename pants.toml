@@ -3,11 +3,8 @@ pants_version = "2.12.1"
 
 backend_packages.add = [
   "pants.backend.python",
-]
-
-[source]
-root_patterns = [
-  '/src/python',
+  'pants.backend.python.lint.black',
+  'pants.backend.python.lint.isort',
 ]
 
 [python]
@@ -19,3 +16,12 @@ enable_resolves = true
 
 [repl]
 shell = "ipython"
+
+[pytest]
+version = "pytest==6.1.2"
+
+[isort]
+args = ["--profile black", "--order-by-type"]
+version = "isort==5.10.1"
+lockfile = "3rdparty/isort.lock"
+

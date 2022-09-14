@@ -25,23 +25,18 @@ yolov5 model. It should work for most modules, but for torchscript model, it
 might not work.
 """  # noqa E501
 
-from typing import Any, Callable, Dict
 import logging
+from typing import Any, Callable, Dict
 
 import numpy as np
 import torch
+from rikai.pytorch.models.torch import TorchModelType
+from rikai.types import Box2d
 from torch.cuda import amp
 from yolov5.models.common import Detections
 from yolov5.utils.datasets import exif_transpose, letterbox
-from yolov5.utils.general import (
-    make_divisible,
-    non_max_suppression,
-    scale_coords,
-)
+from yolov5.utils.general import make_divisible, non_max_suppression, scale_coords
 from yolov5.utils.torch_utils import time_sync
-
-from rikai.pytorch.models.torch import TorchModelType
-from rikai.types import Box2d
 
 __all__ = ["MODEL_TYPE"]
 
@@ -50,9 +45,7 @@ def pre_process_func(im):
     im = np.asarray(exif_transpose(im))
     if im.shape[0] < 5:  # image in CHW
         im = im.transpose((1, 2, 0))  # reverse dataloader .transpose(2, 0, 1)
-    im = (
-        im[..., :3] if im.ndim == 3 else np.tile(im[..., None], 3)
-    )  # enforce 3ch input
+    im = im[..., :3] if im.ndim == 3 else np.tile(im[..., None], 3)  # enforce 3ch input
     return torch.from_numpy(im)
 
 
@@ -67,9 +60,7 @@ class Yolov5ModelType(TorchModelType):
         return pre_process_func
 
     def predict(self, images, *args, **kwargs) -> Any:
-        assert (
-            self.model is not None
-        ), "model has not been initialized via load_model"
+        assert self.model is not None, "model has not been initialized via load_model"
 
         options = self.spec.options
         augment = bool(options.get("augment", False))
@@ -96,21 +87,15 @@ class Yolov5ModelType(TorchModelType):
             shape0.append(s)  # image shape
             g = image_size / max(s)  # gain
             shape1.append([y * g for y in s])
-            imgs[i] = (
-                im if im.data.contiguous else np.ascontiguousarray(im)
-            )  # update
+            imgs[i] = im if im.data.contiguous else np.ascontiguousarray(im)  # update
         shape1 = [
             make_divisible(x, int(self.model.stride.max()))
             for x in np.stack(shape1, 0).max(0)
         ]  # inference shape
-        x = [
-            letterbox(im, new_shape=shape1, auto=False)[0] for im in imgs
-        ]  # pad
+        x = [letterbox(im, new_shape=shape1, auto=False)[0] for im in imgs]  # pad
         x = np.stack(x, 0) if n > 1 else x[0][None]  # stack
         x = np.ascontiguousarray(x.transpose((0, 3, 1, 2)))  # BHWC to BCHW
-        x = (
-            torch.from_numpy(x).to(p.device).type_as(p) / 255.0
-        )  # uint8 to fp16/32
+        x = torch.from_numpy(x).to(p.device).type_as(p) / 255.0  # uint8 to fp16/32
         t.append(time_sync())
 
         with amp.autocast(enabled=p.device.type != "cpu"):
@@ -132,11 +117,15 @@ class Yolov5ModelType(TorchModelType):
             for predicts in detections.pred:
                 preds = []
                 for *box, conf, cls in predicts.tolist():
-                    preds.append({
-                        "box": Box2d(*box),
-                        "label": None if cls is None else self.model.names[int(cls)],
-                        "score": conf,
-                    })
+                    preds.append(
+                        {
+                            "box": Box2d(*box),
+                            "label": None
+                            if cls is None
+                            else self.model.names[int(cls)],
+                            "score": conf,
+                        }
+                    )
                 results.append(preds)
             return results
 
