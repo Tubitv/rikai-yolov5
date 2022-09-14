@@ -1,0 +1,28 @@
+[GLOBAL]
+pants_version = "2.12.1"
+
+backend_packages.add = [
+  "pants.backend.python",
+  'pants.backend.python.lint.black',
+  'pants.backend.python.lint.isort',
+]
+
+[python]
+interpreter_constraints = [">=3.8.*, <4"]
+enable_resolves = true
+
+[python.resolves]
+  yolov5_req = "3rdparty/yolov5.lock"
+
+[repl]
+shell = "ipython"
+
+[pytest]
+version = "pytest==6.1.2"
+lockfile = "3rdparty/pytest.lock"
+
+[isort]
+args = ["--profile black", "--order-by-type"]
+version = "isort==5.10.1"
+lockfile = "3rdparty/isort.lock"
+

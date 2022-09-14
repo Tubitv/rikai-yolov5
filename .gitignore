@@ -7,3 +7,6 @@ mlruns
 dist/
 .vscode/
 notebooks/
+.pants.d/
+.pids/
+.DS_Store
